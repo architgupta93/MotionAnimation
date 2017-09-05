@@ -12,17 +12,18 @@ class Trajectory(object):
     Base class implementing the interface for a trajectory
 
         class properties:
-        - __time (A list of time points at which the sample values are available)
+        - _time (A list of time points at which the sample values are available)
+        - _X (List of associated values for each time point - NUMPY array)
 
     """
 
     def __init__(self, t_vals=np.array(()), x_vals=None):
-        self.__time = t_vals
-        self.__X    = self.__checkDataSize(x_vals)
+        self._time = t_vals
+        self._X    = self._checkDataSize(x_vals)
 
-    def __checkDataSize(self, data):
+    def _checkDataSize(self, data):
         """
-        __checkDataSize(self, data)
+        _checkDataSize(self, data)
         After the TIME data has been set up, everythin else must match the
         dimensions of the time data. This function checks for the dimesions. If
         a NoneType object is supplied as data, ALL ZEROS are returned with the
@@ -30,11 +31,11 @@ class Trajectory(object):
         """
 
         # Check the size of t_vals and set x_vals appropriately
-        if (x_vals == None):
-            x_vals = np.zeros(t_vals.shape)
-        elif (x_vals.shape != t_vals.shape):
+        if data is None:
+            data = np.zeros(self._time.shape)
+        elif (data.shape != self._time.shape):
             raise Exception("Data dimensions not matched. Expect TIME data to match sample values in size")
-
+        return data
 
     def plotTimedTR(self, figure_handle):
         """
@@ -50,7 +51,7 @@ class Trajectory(object):
 
         raise NotImplementedError
 
-    def plotStaticTR(self, figure_handle):
+    def plotStaticTR(self, figure_handle=None):
         """
         plotStaticTR(self, figure_handle)
         Function is used to plot the trajectory data as a static plot in the
@@ -63,15 +64,15 @@ class Trajectory(object):
 
         """
 
-        list_of_sample_values   = self.__getSampleValues()
+        list_of_sample_values   = self.getSampleValues()
 
         # TODO: Find a way to set up the figure handle
-        np.plot(*list_of_sample_values)
-        np.show()
+        pl.plot(*list_of_sample_values)
+        pl.show()
         
-    def __getSampleValues(self):
+    def getSampleValues(self):
         """
-        __getSampleValues(self) [PRIVATE FUNCTION]
+        getSampleValues(self) [PRIVATE FUNCTION]
         Gets you a list of values that can directly be piped into PL for
         plotting.
 
@@ -79,7 +80,7 @@ class Trajectory(object):
 
         """
 
-        return [self.__X]
+        return [self._X]
 
 class Trajectory__2D(Trajectory):
 
@@ -89,17 +90,18 @@ class Trajectory__2D(Trajectory):
     """
 
     def __init__(self, t_vals, x_vals, y_vals):
-        self.__Y    = np.array(()) 
+        super(Trajectory__2D, self).__init__(t_vals, x_vals)
+        self._Y    = self._checkDataSize(y_vals)
     
-    def __getSampleValues(self):
+    def getSampleValues(self):
         """
-        __getSampleValues(self) [PROTECTED FUNCTION]
+        getSampleValues(self) [PROTECTED FUNCTION]
 
         :returns: A list of [X, Y] sample values
 
         """
        
-        return [self.__X, self.__Y]
+        return [self._X, self._Y]
 
 class Trajectory__3D(Trajectory__2D):
 
@@ -109,14 +111,15 @@ class Trajectory__3D(Trajectory__2D):
     """
 
     def __init__(self, t_vals, x_vals, y_vals, z_vals):
-        self.__Z    = np.array(())
+        super(Trajectory__3D, self).__init__(t_vals, x_vals, y_vals)
+        self._Z    = self._checkDataSize(z_vals)
     
-    def __getSampleValues(self):
+    def getSampleValues(self):
         """
-        __getSampleValues(self) [PROTECTED FUNCTION]
+        getSampleValues(self) [PROTECTED FUNCTION]
 
         :returns: A list of [X, Y, Z] sample values
 
         """
        
-        return [self.__X, self.__Y, self.__Z]
+        return [self._X, self._Y, self._Z]
