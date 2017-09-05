@@ -173,3 +173,25 @@ class TrajectorySet(object):
             tr.plotStaticTR(figure_handle, False)
 
         figure_handle.show()
+
+def getTRClass(n_dims):
+    """
+    getTRClass(n_dims)
+    In some cases, the user might have to decide which class needs to be used
+    at runtime. We can facilitate this by taking in the number of data
+    dimensions as an input and returning a handle to the constructor of the
+    appropriate trajectory class
+
+    :n_dims: Number of dimensions for the input
+    :returns: Handle to the constructor of the appropriate class
+
+    """
+
+    if (n_dims == 1):
+        return Trajectory
+    elif (n_dims == 2):
+        return Trajectory__2D
+    elif (n_dims == 3):
+        return Trajectory__3D
+
+    raise Exception("Too many dimensions for a visualizable TRAJECTORY.")
