@@ -51,7 +51,7 @@ class Trajectory(object):
 
         raise NotImplementedError
 
-    def plotStaticTR(self, figure_handle=None):
+    def plotStaticTR(self, figure_handle=None, show=True):
         """
         plotStaticTR(self, figure_handle)
         Function is used to plot the trajectory data as a static plot in the
@@ -59,6 +59,8 @@ class Trajectory(object):
 
         :figure_handle: Handle to a window in which the trajectory should be
             plotted
+        :show: Determines whether the figure is displayed at the end of the
+            function call or not
         :returns: TRUE if the plot went through successfully, raises
             appropriate exception otherwise.
 
@@ -67,8 +69,15 @@ class Trajectory(object):
         list_of_sample_values   = self.getSampleValues()
 
         # TODO: Find a way to set up the figure handle
+        if figure_handle is not None:
+            pl.figure(figure_handle.number)
+        else:
+            pl.figure()
+
         pl.plot(*list_of_sample_values)
-        pl.show()
+
+        if (show):
+            pl.show()
         
     def getSampleValues(self):
         """
@@ -123,3 +132,44 @@ class Trajectory__3D(Trajectory__2D):
         """
        
         return [self._X, self._Y, self._Z]
+
+class TrajectorySet(object):
+
+    """
+    A set of trajectories (all of which may or may not be of the same kind but
+    need to be plotted together for visualization)
+    """
+
+    def __init__(self):
+        """
+        class constructor 
+        """
+
+        self._tr_set = []
+        
+    def append(self, tr):
+        """
+        Append a new trajectory to the list of trajectories stored in the set
+
+        :tr: An instance of the Trajectory class (or any of its subclasses)
+            that we wish to append to the already existing list of trajectories
+
+        """
+
+        self._tr_set    += [tr]
+
+    def plotStaticTR(self, figure_handle=None):
+        """
+        plotStaticTR(self, figure_handle)
+        Function for plotting multiple trajectories together
+
+        :figure_handle: Handle for the figure window in which the trajectories should be plotted
+        """
+
+        if figure_handle is None:
+            figure_handle = pl.figure()
+
+        for tr in self._tr_set:
+            tr.plotStaticTR(figure_handle, False)
+
+        figure_handle.show()
