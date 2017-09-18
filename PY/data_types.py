@@ -19,8 +19,13 @@ class Trajectory(object):
     """
 
     def __init__(self, t_vals=np.array(()), x_vals=None):
+
+        self._AXES_IDENTIFIER = None
         self._time = t_vals
         self._X    = self._checkDataSize(x_vals)
+
+    def getAxisIdentifier(self):
+        return(self._AXES_IDENTIFIER)
 
     def _checkDataSize(self, data):
         """
@@ -119,6 +124,7 @@ class Trajectory__3D(Trajectory__2D):
 
     def __init__(self, t_vals, x_vals, y_vals, z_vals):
         super(Trajectory__3D, self).__init__(t_vals, x_vals, y_vals)
+        self._AXES_IDENTIFIER = '3d'
         self._Z    = self._checkDataSize(z_vals)
     
     def getSampleValues(self):
@@ -138,13 +144,11 @@ class TrajectorySet(object):
     need to be plotted together for visualization)
     """
 
-    __AXES_3D_IDENTIFIER   = '3d'
-
     def __init__(self):
         """
         class constructor 
         """
-
+        self._axis_identifier = None
         self._tr_set = []
         
     def append(self, tr):
@@ -156,6 +160,9 @@ class TrajectorySet(object):
 
         """
 
+        trajectory_axis_identifier = tr.getAxisIdentifier()
+        if trajectory_axis_identifier is not None:
+            self._axis_identifier = trajectory_axis_identifier
         self._tr_set    += [tr]
 
     def plotStaticTR(self, figure_handle=None):
@@ -167,7 +174,7 @@ class TrajectorySet(object):
         """
 
         if figure_handle is None:
-            figure_handle = GraphicsContainer()
+            figure_handle = GraphicsContainer(self._axis_identifier)
 
         for tr in self._tr_set:
             tr.plotStaticTR(figure_handle, False)
