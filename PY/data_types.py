@@ -4,6 +4,7 @@ This file implements data types for describing trajectories that we will be plot
 
 import numpy as np
 import matplotlib.pyplot as pl
+from .graphics import GraphicsContainer
 
 class Trajectory(object):
 
@@ -69,15 +70,12 @@ class Trajectory(object):
         list_of_sample_values   = self.getSampleValues()
 
         # TODO: Find a way to set up the figure handle
-        if figure_handle is not None:
-            pl.figure(figure_handle.number)
-        else:
-            pl.figure()
+        if figure_handle is None:
+            figure_handle = GraphicsContainer()
 
-        pl.plot(*list_of_sample_values)
+        figure_handle.plot(*list_of_sample_values)
 
-        if (show):
-            pl.show()
+        return(True)
         
     def getSampleValues(self):
         """
@@ -140,6 +138,8 @@ class TrajectorySet(object):
     need to be plotted together for visualization)
     """
 
+    __AXES_3D_IDENTIFIER   = '3d'
+
     def __init__(self):
         """
         class constructor 
@@ -167,7 +167,7 @@ class TrajectorySet(object):
         """
 
         if figure_handle is None:
-            figure_handle = pl.figure()
+            figure_handle = GraphicsContainer()
 
         for tr in self._tr_set:
             tr.plotStaticTR(figure_handle, False)
