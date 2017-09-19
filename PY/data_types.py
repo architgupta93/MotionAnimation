@@ -4,6 +4,7 @@ This file implements data types for describing trajectories that we will be plot
 
 import numpy as np
 import matplotlib.pyplot as pl
+import matplotlib.animation as animation
 from .graphics import GraphicsContainer
 
 class Trajectory(object):
@@ -43,7 +44,7 @@ class Trajectory(object):
             raise Exception("Data dimensions not matched. Expect TIME data to match sample values in size")
         return data
 
-    def plotTimedTR(self, figure_handle):
+    def plotTimedTR(self, figure_handle=None):
         """
         plotTimedTR(self, figure_handle)
         Function is used to animate the trajectories in time
@@ -55,7 +56,12 @@ class Trajectory(object):
 
         """
 
-        raise NotImplementedError
+        list_of_sample_values   = self.getSampleValues()
+        if figure_handle is None:
+            figure_handle = GraphicsContainer(self._AXES_IDENTIFIER)
+
+        figure_handle.animate(self._time, *list_of_sample_values)
+        return(True)
 
     def plotStaticTR(self, figure_handle=None, show=True):
         """
@@ -74,9 +80,8 @@ class Trajectory(object):
 
         list_of_sample_values   = self.getSampleValues()
 
-        # TODO: Find a way to set up the figure handle
         if figure_handle is None:
-            figure_handle = GraphicsContainer()
+            figure_handle = GraphicsContainer(self._AXES_IDENTIFIER)
 
         figure_handle.plot(*list_of_sample_values)
 

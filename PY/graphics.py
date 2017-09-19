@@ -26,6 +26,20 @@ class GraphicsContainer(object):
         # Storage for all the line plots
         self._lines     = []
     
+    def animate(self, tpts, *plt_args):
+        """
+        animate(self, *plt_args)
+        Function that plots time-value data as animations in 1, 2 or 3
+        dimensions.
+
+        :tpts: Time points at which data will be supplied for animation
+        :*plt_args: Inputs data that has to be animated. Each argument in the
+            list given by plt_args should have the same number of points as
+            tpts
+        """
+        
+        raise NotImplementedError
+
     def plot(self, *plt_args):
         """
         plot(self, *plt_args)
@@ -54,4 +68,5 @@ class GraphicsContainer(object):
             self._axes.set_zlabel(self._z_label)
         
         # Display the plot
+        pl.ion()
         pl.show(self._axes)
