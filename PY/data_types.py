@@ -30,7 +30,7 @@ class Trajectory(object):
         The value returned by this function helps us distinguish a single
         trajectory from a set of trajectories
         """
-        return(-1)
+        return(1)
 
     def getTPts(self):
         return self._time
@@ -172,8 +172,32 @@ class TrajectorySet(object):
     def getNTrajectories(self):
         return(len(self._tr_set))
 
-    def getTPts(self):
-        return([tr.getTPts() for tr in self._tr_set])
+    def getTPts(self, index=0):
+        """
+        getTPts(self, index)
+        Function returns the time points for the trajectory specified by index
+
+        :index: The index of the trajectory for which the time points are
+            required
+        """
+        if (index > len(self._tr_set)):
+            raise Exception("Index access out of the set range")
+
+        return self._tr_set[index].getTPts()
+
+    def getSampleValues(self, index=0):
+        """
+        getSampleValues(self, index)
+        Function returns the sample values for the trajectory specified by index
+
+        :index: The index of the trajectory for which the sample values are
+            required
+        """
+        # TODO: Maybe we can create a common function to check for indices
+        if (index > len(self._tr_set)):
+            raise Exception("Index access out of the set range")
+
+        return self._tr_set[index].getSampleValues()
 
     def append(self, tr):
         """
@@ -216,7 +240,11 @@ class TrajectorySet(object):
             should be plotted
         """
 
-        raise NotImplementedError
+        if figure_handle is None:
+            figure_handle = GraphicsContainer(self._axis_identifier)
+
+        figure_handle.animate(self)
+
 
 def getTRClass(n_dims):
     """

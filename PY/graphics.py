@@ -66,11 +66,12 @@ class GraphicsContainer(object):
             frame
         """
 
+        # Found BUG: step is not updated in consecutive calls to the animation frame
         for idx, anim_data in enumerate(self._anim_data):
             self._past_data[idx] += [anim_data[step]]
 
         self._update()
-        return self._lines,
+        return self._lines
 
     def animate(self, tr_obj):
         """
@@ -94,14 +95,6 @@ class GraphicsContainer(object):
         tpts            = tr_obj.getTPts()
 
         n_frames        = len(tpts)
-        if (n_trajectories > 0):
-            n_frames    = len([tpts[0]]) 
-        else:
-            # Now that we have distinguished between a single trajectory and
-            # multiple trajectoies, we can fix up this value appropriately. All
-            # this pain was necessary because one could ask for animating 1
-            # trajectory inside a trajectory set
-            n_trajectories = 1
 
         self._tpts      = tpts
         self._anim_data = []
@@ -111,8 +104,14 @@ class GraphicsContainer(object):
             self._anim_data.append(arg)
             self._past_data.append([])
 
+        # Lets take a look at the data that we have obtained
+        print(self._anim_data)
+
         # Set up the line plots for animation
-        self._lines,    = pl.plot([], [], 'r-', animated=True)
+        print("Animating", n_trajectories, "trajectories, and", n_frames, "frames.")
+        self._lines     = [[] for traj in range(n_trajectories)]
+        for traj in range(n_trajectories):
+            self._lines[traj],    = pl.plot([], [], animated=True)
 
         anim = animation.FuncAnimation(self._figure, self._nextAnimationFrame, np.arange(0, n_frames), \
                 init_func=self._initAnimationFrame, interval=self._ANIMATION_INTERVAL, blit=True)
@@ -120,7 +119,7 @@ class GraphicsContainer(object):
         pl.show()
 
 
-    def _update(self, *plt_args):
+    def _update(self):
         """
         _update(self)
         Local function used to update an exisiting set of line plots. We can
@@ -134,7 +133,8 @@ class GraphicsContainer(object):
         # as we already have in the current plot.
         # assert(len(self._lines) == len(plt_args))
 
-        self._lines.set_data(*self._past_data)
+        for line in self._lines:
+            line.set_data(*self._past_data)
 
     def plot(self, *plt_args):
         """
