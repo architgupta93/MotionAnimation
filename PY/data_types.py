@@ -84,6 +84,7 @@ class Trajectory(object):
             figure_handle = GraphicsContainer(self._AXES_IDENTIFIER)
 
         figure_handle.plot(*list_of_sample_values)
+        figure_handle.show()
 
         return(True)
         

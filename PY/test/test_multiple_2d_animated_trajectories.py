@@ -14,7 +14,6 @@ yvals   = -2.0 * tpts * np.cos(np.pi * tpts)
 
 # Bundle the data together in a Trajectory
 xy_tr   = mtype.Trajectory__2D(tpts, xvals, yvals)
-# xy_tr.plotTimedTR()
 
 # Add another trajectory to the plot. This one has a different number of time
 # points, say more finely sampled in the same range
