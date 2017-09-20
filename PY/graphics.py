@@ -34,6 +34,22 @@ class GraphicsContainer(object):
         # Storage for all the line plots
         self._lines     = []
 
+    def _initAnimationFrame(self):
+        """
+        _initAnimationFrame(self)
+        Local function used for initializing the animation frame
+
+        :returns: Line object which should be plotted in the first animation
+            frame
+        """
+
+        self._axes.set_xlim(min(self._anim_data[0]), max(self._anim_data[0]))
+        self._axes.set_ylim(min(self._anim_data[1]), max(self._anim_data[1]))
+
+        # TODO: Set the limits for Z coordinate
+
+        return self._nextAnimationFrame()
+
     def _nextAnimationFrame(self, step=0):
         """
         _nextAnimationFrame(self, n_steps)
@@ -46,13 +62,12 @@ class GraphicsContainer(object):
             frame
         """
 
-        self._lines = []
-        initial_plt_args = []
+        plt_args = []
         for anim_data in self._anim_data:
-            initial_plt_args = anim_data[:step+1]
+            plt_args += [anim_data[:step+1]]
 
-        self.plot(*initial_plt_args)
-        return self._lines,
+        self.plot(*plt_args)
+        return self._lines[0],
 
     def animate(self, tpts, *plt_args):
         """
@@ -79,10 +94,13 @@ class GraphicsContainer(object):
         for arg in plt_args:
             self._anim_data.append(arg)
 
-        animation.FuncAnimation(self._figure, self._nextAnimationFrame, np.arange(0, n_frames), \
-                init_func=self._nextAnimationFrame, interval=self._ANIMATION_INTERVAL, blit=True)
+        # Set up the line plots for animation
+        self._lines,    = pl.plot([], [], 'ro', animated=True)
 
-        self.show()
+        anim = animation.FuncAnimation(self._figure, self._nextAnimationFrame, np.arange(0, n_frames), \
+                init_func=self._initAnimationFrame, interval=self._ANIMATION_INTERVAL, blit=True)
+
+        pl.show()
 
 
     def _update(self, *plt_args):
@@ -114,7 +132,7 @@ class GraphicsContainer(object):
             plotted
         """
         
-        self._lines     += self._axes.plot(*plt_args)
+        self._lines     = self._axes.plot(*plt_args)
 
     def show(self):
         """
