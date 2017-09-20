@@ -26,6 +26,9 @@ class GraphicsContainer(object):
         self._y_label   = 'y'
         self._z_label   = 'z'
 
+        # Include a pointer to the trajectory object
+        self._tr_obj    = []
+
         # Parameters for animation
         self._past_data = []
         self._anim_data = []
@@ -69,16 +72,15 @@ class GraphicsContainer(object):
         self._update()
         return self._lines,
 
-    def animate(self, tpts, *plt_args):
+    def animate(self, tr_obj):
         """
-        animate(self, *plt_args)
+        animate(self, tr_obj)
         Function that plots time-value data as animations in 1, 2 or 3
         dimensions.
 
-        :tpts: Time points at which data will be supplied for animation
-        :*plt_args: Inputs data that has to be animated. Each argument in the
-            list given by plt_args should have the same number of points as
-            tpts
+        :tr_obj: The trajectory object that has to be animated. This can be a
+            single 1, 2, or 3 dimensional trajectory or a collection of several
+            of these in a TrajectorySet container
         """
 
         # FuncAnimation is the animation type where a function is repeatedly
@@ -88,11 +90,24 @@ class GraphicsContainer(object):
         # 2. ArtistAnimation (Entire animation is recorded in the form of
         #   Artists already and is just replayed)
 
+        n_trajectories  = tr_obj.getNTrajectories()
+        tpts            = tr_obj.getTPts()
+
         n_frames        = len(tpts)
+        if (n_trajectories > 0):
+            n_frames    = len([tpts[0]]) 
+        else:
+            # Now that we have distinguished between a single trajectory and
+            # multiple trajectoies, we can fix up this value appropriately. All
+            # this pain was necessary because one could ask for animating 1
+            # trajectory inside a trajectory set
+            n_trajectories = 1
+
         self._tpts      = tpts
         self._anim_data = []
         self._past_data = []
-        for arg in plt_args:
+
+        for arg in tr_obj.getSampleValues():
             self._anim_data.append(arg)
             self._past_data.append([])
 

@@ -25,6 +25,16 @@ class Trajectory(object):
         self._time = t_vals
         self._X    = self._checkDataSize(x_vals)
 
+    def getNTrajectories(self):
+        """
+        The value returned by this function helps us distinguish a single
+        trajectory from a set of trajectories
+        """
+        return(-1)
+
+    def getTPts(self):
+        return self._time
+
     def getAxisIdentifier(self):
         return(self._AXES_IDENTIFIER)
 
@@ -60,7 +70,7 @@ class Trajectory(object):
         if figure_handle is None:
             figure_handle = GraphicsContainer(self._AXES_IDENTIFIER)
 
-        figure_handle.animate(self._time, *list_of_sample_values)
+        figure_handle.animate(self)
         return(True)
 
     def plotStaticTR(self, figure_handle=None, show=True):
@@ -159,6 +169,12 @@ class TrajectorySet(object):
         self._axis_identifier = None
         self._tr_set = []
         
+    def getNTrajectories(self):
+        return(len(self._tr_set))
+
+    def getTPts(self):
+        return([tr.getTPts() for tr in self._tr_set])
+
     def append(self, tr):
         """
         Append a new trajectory to the list of trajectories stored in the set
