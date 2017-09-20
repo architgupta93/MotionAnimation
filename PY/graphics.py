@@ -27,6 +27,7 @@ class GraphicsContainer(object):
         self._z_label   = 'z'
 
         # Parameters for animation
+        self._past_data = []
         self._anim_data = []
         self._tpts      = []
         self._ANIMATION_INTERVAL = 25   # Frame rate for animation
@@ -52,7 +53,7 @@ class GraphicsContainer(object):
 
     def _nextAnimationFrame(self, step=0):
         """
-        _nextAnimationFrame(self, n_steps)
+        _nextAnimationFrame(self, step)
         Local function used for animations of trajectories. If no value for
         'step' or the frame index is provided, this returns the first frame
         (default). It can therefore be used for the initial frame too
@@ -62,12 +63,11 @@ class GraphicsContainer(object):
             frame
         """
 
-        plt_args = []
-        for anim_data in self._anim_data:
-            plt_args += [anim_data[:step+1]]
+        for idx, anim_data in enumerate(self._anim_data):
+            self._past_data[idx] += [anim_data[step]]
 
-        self.plot(*plt_args)
-        return self._lines[0],
+        self._update()
+        return self._lines,
 
     def animate(self, tpts, *plt_args):
         """
@@ -91,11 +91,13 @@ class GraphicsContainer(object):
         n_frames        = len(tpts)
         self._tpts      = tpts
         self._anim_data = []
+        self._past_data = []
         for arg in plt_args:
             self._anim_data.append(arg)
+            self._past_data.append([])
 
         # Set up the line plots for animation
-        self._lines,    = pl.plot([], [], 'ro', animated=True)
+        self._lines,    = pl.plot([], [], 'r-', animated=True)
 
         anim = animation.FuncAnimation(self._figure, self._nextAnimationFrame, np.arange(0, n_frames), \
                 init_func=self._initAnimationFrame, interval=self._ANIMATION_INTERVAL, blit=True)
@@ -105,22 +107,19 @@ class GraphicsContainer(object):
 
     def _update(self, *plt_args):
         """
-        _update(self, *plt_args)
+        _update(self)
         Local function used to update an exisiting set of line plots. We can
-        append the data supplied in *plt_args to the existing line plots
+        append the data in self._past_data to the existing line plots
 
-        :*plt_args: A list of plotting arguments. Each entry in the list
-            corresponds to a line plots which we SHOULD already have in the
-            plot. We append the exisiting line plots with this data
         :returns: Line object which can be used by matplotlib's animation
             module
         """
 
         # Make sure that we have the correct number of line plots being fed in
         # as we already have in the current plot.
-        assert(len(self._lines) == len(plt_args))
+        # assert(len(self._lines) == len(plt_args))
 
-        raise NotImplementedError
+        self._lines.set_data(*self._past_data)
 
     def plot(self, *plt_args):
         """
@@ -132,7 +131,7 @@ class GraphicsContainer(object):
             plotted
         """
         
-        self._lines     = self._axes.plot(*plt_args)
+        self._lines     += self._axes.plot(*plt_args)
 
     def show(self):
         """
