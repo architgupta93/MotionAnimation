@@ -175,7 +175,8 @@ class TrajectorySet(object):
         plotStaticTR(self, figure_handle)
         Function for plotting multiple trajectories together
 
-        :figure_handle: Handle for the figure window in which the trajectories should be plotted
+        :figure_handle: Handle for the figure window in which the trajectories
+            should be plotted
         """
 
         if figure_handle is None:
@@ -185,6 +186,18 @@ class TrajectorySet(object):
             tr.plotStaticTR(figure_handle, False)
 
         figure_handle.show()
+
+    def plotTimedTR(self, figure_handle=None):
+        """
+        plotTimedTR(self, figure_handle)
+        Function for plotting multiple animated trajectories that are synchronized
+        in time
+
+        :figure_handle: Handle for the figure object in which the trajectories
+            should be plotted
+        """
+
+        raise NotImplementedError
 
 def getTRClass(n_dims):
     """
