@@ -5,7 +5,7 @@ import numpy as np
 tstart  = 0.0
 tstop   = 1.0
 
-n_pts   = 100
+n_pts   = 4
 tpts    = np.linspace(tstart, tstop, n_pts)
 
 # Some random test functions for generating XY data
@@ -18,7 +18,7 @@ xy_tr   = mtype.Trajectory__2D(tpts, xvals, yvals)
 # Add another trajectory to the plot. This one has a different number of time
 # points, say more finely sampled in the same range
 
-n_pts2  = 200
+n_pts2  = 4
 tpts2   = np.linspace(tstart, tstop, n_pts2)
 
 # Another test trajectory constructed with the new time points

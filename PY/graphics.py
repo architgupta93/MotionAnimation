@@ -47,8 +47,21 @@ class GraphicsContainer(object):
             frame
         """
 
-        self._axes.set_xlim(min(self._anim_data[0]), max(self._anim_data[0]))
-        self._axes.set_ylim(min(self._anim_data[1]), max(self._anim_data[1]))
+        min_x = np.inf
+        max_x = -np.inf
+        min_y = np.inf
+        max_y = -np.inf
+
+        for idx, line in enumerate(self._lines):
+            min_x = min(min_x, min(self._anim_data[idx][0]))
+            max_x = max(max_x, max(self._anim_data[idx][0]))
+
+            min_y = min(min_y, min(self._anim_data[idx][1]))
+            max_y = max(max_y, max(self._anim_data[idx][1]))
+
+        print("Setting Axes limits: (", min_x, ",", max_x, "), (", min_y, ",", max_y, ")")
+        self._axes.set_xlim(min_x, max_x)
+        self._axes.set_ylim(min_y, max_y)
 
         # TODO: Set the limits for Z coordinate
 
@@ -66,9 +79,13 @@ class GraphicsContainer(object):
             frame
         """
 
-        # Found BUG: step is not updated in consecutive calls to the animation frame
+        print("Setting up next frame")
+
         for idx, anim_data in enumerate(self._anim_data):
-            self._past_data[idx] += [anim_data[step]]
+            # This loop enumerates each trajectory
+            # Now within each trajectory, we need to enumerate each dimension
+            for dim, dim_data in enumerate(anim_data):
+                self._past_data[idx][dim] += [dim_data[step]]
 
         self._update()
         return self._lines
@@ -100,11 +117,13 @@ class GraphicsContainer(object):
         self._anim_data = []
         self._past_data = []
 
-        for arg in tr_obj.getSampleValues():
-            self._anim_data.append(arg)
+        for traj in range(n_trajectories):
+            self._anim_data.append([])
             self._past_data.append([])
+            for arg in tr_obj.getSampleValues(traj):
+                self._anim_data[traj].append(arg)
+                self._past_data[traj].append([])
 
-        # Lets take a look at the data that we have obtained
         print(self._anim_data)
 
         # Set up the line plots for animation
@@ -114,7 +133,8 @@ class GraphicsContainer(object):
             self._lines[traj],    = pl.plot([], [], animated=True)
 
         anim = animation.FuncAnimation(self._figure, self._nextAnimationFrame, np.arange(0, n_frames), \
-                init_func=self._initAnimationFrame, interval=self._ANIMATION_INTERVAL, blit=True)
+                init_func=self._initAnimationFrame, interval=self._ANIMATION_INTERVAL, blit=True, \
+                repeat=False)
 
         pl.show()
 
@@ -133,8 +153,8 @@ class GraphicsContainer(object):
         # as we already have in the current plot.
         # assert(len(self._lines) == len(plt_args))
 
-        for line in self._lines:
-            line.set_data(*self._past_data)
+        for idx, line in enumerate(self._lines):
+            line.set_data(*self._past_data[idx])
 
     def plot(self, *plt_args):
         """
