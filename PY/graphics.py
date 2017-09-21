@@ -59,7 +59,7 @@ class GraphicsContainer(object):
             min_y = min(min_y, min(self._anim_data[idx][1]))
             max_y = max(max_y, max(self._anim_data[idx][1]))
 
-        print("Setting Axes limits: (", min_x, ",", max_x, "), (", min_y, ",", max_y, ")")
+        # print("Setting Axes limits: (", min_x, ",", max_x, "), (", min_y, ",", max_y, ")")
         self._axes.set_xlim(min_x, max_x)
         self._axes.set_ylim(min_y, max_y)
 
@@ -79,7 +79,7 @@ class GraphicsContainer(object):
             frame
         """
 
-        print("Setting up next frame")
+        # print("Setting up next frame")
 
         for idx, anim_data in enumerate(self._anim_data):
             # This loop enumerates each trajectory
@@ -124,14 +124,17 @@ class GraphicsContainer(object):
                 self._anim_data[traj].append(arg)
                 self._past_data[traj].append([])
 
-        print(self._anim_data)
+        # print(self._anim_data)
 
         # Set up the line plots for animation
-        print("Animating", n_trajectories, "trajectories, and", n_frames, "frames.")
+        # print("Animating", n_trajectories, "trajectories, and", n_frames, "frames.")
         self._lines     = [[] for traj in range(n_trajectories)]
         for traj in range(n_trajectories):
             self._lines[traj],    = pl.plot([], [], animated=True)
 
+        # TODO: Setting blit to True causes the initialization function to be
+        # called twice instead of just one time, strange. Setting it to false,
+        # however, stops all plotting.
         anim = animation.FuncAnimation(self._figure, self._nextAnimationFrame, np.arange(0, n_frames), \
                 init_func=self._initAnimationFrame, interval=self._ANIMATION_INTERVAL, blit=True, \
                 repeat=False)
