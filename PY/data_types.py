@@ -32,7 +32,12 @@ class Trajectory(object):
         """
         return(1)
 
-    def getTPts(self):
+    def getTPts(self, *opts):
+        """
+        Optional variable number of arguments *opts are not used. They are only
+        here to maintain consistency with the calling syntax for a trajectory
+        set
+        """
         return self._time
 
     def getAxisIdentifier(self):
@@ -100,12 +105,15 @@ class Trajectory(object):
 
         return(True)
         
-    def getSampleValues(self):
+    def getSampleValues(self, *opts):
         """
-        getSampleValues(self) [PRIVATE FUNCTION]
+        getSampleValues(self, *opts)
         Gets you a list of values that can directly be piped into PL for
         plotting.
 
+        :*opts: Variable input argument list not used by the function. It is
+            here to maintain consistency with the calling syntax for trajectory
+            set class
         :returns: The sample values of the trajector as a list of numpy arrays.
 
         """
@@ -123,7 +131,7 @@ class Trajectory__2D(Trajectory):
         super(Trajectory__2D, self).__init__(t_vals, x_vals)
         self._Y    = self._checkDataSize(y_vals)
     
-    def getSampleValues(self):
+    def getSampleValues(self, *opts):
         """
         getSampleValues(self) [PROTECTED FUNCTION]
 
@@ -145,7 +153,7 @@ class Trajectory__3D(Trajectory__2D):
         self._AXES_IDENTIFIER = '3d'
         self._Z    = self._checkDataSize(z_vals)
     
-    def getSampleValues(self):
+    def getSampleValues(self, *opts):
         """
         getSampleValues(self) [PROTECTED FUNCTION]
 
