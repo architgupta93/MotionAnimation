@@ -18,7 +18,7 @@ xy_tr   = mtype.Trajectory__2D(tpts, xvals, yvals)
 # Add another trajectory to the plot. This one has a different number of time
 # points, say more finely sampled in the same range
 
-n_pts2  = 100
+n_pts2  = 1000
 tpts2   = np.linspace(tstart, tstop, n_pts2)
 
 # Another test trajectory constructed with the new time points

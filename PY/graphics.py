@@ -33,6 +33,7 @@ class GraphicsContainer(object):
         self._past_data = []
         self._anim_data = []
         self._tpts      = []
+        self._t_elapsed = []
         self._ANIMATION_INTERVAL = 25   # Frame rate for animation
 
         # Storage for all the line plots
@@ -46,6 +47,12 @@ class GraphicsContainer(object):
         :returns: Line object which should be plotted in the first animation
             frame
         """
+
+        # We require that all trajectories should start at the same time. While
+        # the exact t0 values might not be identical because of finite
+        # precision arithmetic, all t0 values should be smaller than all t1
+        # values
+        # TODO: Check this here
 
         min_x = np.inf
         max_x = -np.inf
@@ -80,12 +87,18 @@ class GraphicsContainer(object):
         """
 
         # print("Setting up next frame")
+        next_time_val_for_frame = self._tpts[0][step]
+        # print("Searching for time point:", next_time_val_for_frame)
 
         for idx, anim_data in enumerate(self._anim_data):
             # This loop enumerates each trajectory
             # Now within each trajectory, we need to enumerate each dimension
+            idx_step = np.searchsorted(self._tpts[idx], next_time_val_for_frame)
+            # print("Time point: ", self._tpts[idx][idx_step], "found at index:", idx_step)
             for dim, dim_data in enumerate(anim_data):
-                self._past_data[idx][dim] += [dim_data[step]]
+                for frame_index in range(self._t_elapsed[idx], idx_step):
+                    self._past_data[idx][dim].append(dim_data[frame_index])
+            self._t_elapsed[idx] = idx_step
 
         self._update()
         return self._lines
@@ -109,11 +122,17 @@ class GraphicsContainer(object):
         #   Artists already and is just replayed)
 
         n_trajectories  = tr_obj.getNTrajectories()
-        tpts            = tr_obj.getTPts()
 
-        n_frames        = len(tpts)
+        self._tpts      = [tr_obj.getTPts(traj) for traj in range(n_trajectories)]
 
-        self._tpts      = tpts
+        # t_elapsed stores the index of the last time point that elapsed for
+        # the animation frame
+        self._t_elapsed = [0 for traj in range(n_trajectories)]
+
+        # This gets the time points for the first trajectory. By default, this
+        # serves as the reference time
+        n_frames        = len(self._tpts[0])
+
         self._anim_data = []
         self._past_data = []
 
