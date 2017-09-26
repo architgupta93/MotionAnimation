@@ -11,12 +11,18 @@ class GraphicsContainer(object):
     this object is used for rendering both static and dynamic plots
     """
 
+    TEXT_FONT_SIZE      = 16
+
     def __init__(self, axes_projection=None):
         """
         Class constructor
         :axes_projection: In case a 3D plot is required, axes can be set up for
             it by passing the argument '3d' as axes_projection
         """
+
+        # Before plotting anything, update the appropriate font sizes. This
+        # should probably be done in the __init__ file: TODO
+        pl.rcParams.update({'font.size':GraphicsContainer.TEXT_FONT_SIZE})
 
         # By default, we have 2D axes.
         self._figure    = pl.figure()     
@@ -25,6 +31,9 @@ class GraphicsContainer(object):
         self._x_label   = 'x'
         self._y_label   = 'y'
         self._z_label   = 'z'
+
+        # Some paratmeters for plotting
+        self._line_width    = 2.0
 
         # Include a pointer to the trajectory object
         self._tr_obj    = []
@@ -206,6 +215,10 @@ class GraphicsContainer(object):
         if (self._is_3d):
             self._axes.set_zlabel(self._z_label)
         
+        # Set up the line widths and fonts for axes labels
+        for line in self._lines:
+            line.set_linewidth(self._line_width)
+
         # Display the plot
         pl.ion()
         pl.show(self._axes)
