@@ -11,7 +11,7 @@ class GraphicsContainer(object):
     this object is used for rendering both static and dynamic plots
     """
 
-    TEXT_FONT_SIZE      = 16
+    TEXT_FONT_SIZE      = 20
 
     def __init__(self, axes_projection=None):
         """
@@ -33,7 +33,7 @@ class GraphicsContainer(object):
         self._z_label   = 'z'
 
         # Some paratmeters for plotting
-        self._line_width    = 2.0
+        self._line_width    = 3.0
 
         # Include a pointer to the trajectory object
         self._tr_obj    = []
