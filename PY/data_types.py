@@ -20,7 +20,7 @@ class Trajectory(object):
     """
 
     OBJ_TYPE_LINE = 'line'
-    OBJ_TYPE_DOT  = 'dot'
+    OBJ_TYPE_DOT  = 'point'
 
     def __init__(self, t_vals=np.array(()), x_vals=None):
 
@@ -77,7 +77,7 @@ class Trajectory(object):
         """
 
         list_of_sample_values   = self.getSampleValues()
-        figure_handle = getFigureHandle(self._AXES_IDENTIFIER, in_fhandle=figure_handle)
+        figure_handle = getFigureHandle(self._AXES_IDENTIFIER, object_type, in_fhandle=figure_handle)
         figure_handle.animate(self)
         return(True)
 
@@ -100,7 +100,7 @@ class Trajectory(object):
 
         list_of_sample_values   = self.getSampleValues()
 
-        figure_handle = getFigureHandle(self._AXES_IDENTIFIER, in_fhandle=figure_handle)
+        figure_handle = getFigureHandle(self._AXES_IDENTIFIER, object_type, in_fhandle=figure_handle)
         figure_handle.plot(*list_of_sample_values)
 
         if (show):
