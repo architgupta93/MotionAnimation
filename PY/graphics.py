@@ -83,6 +83,41 @@ class GraphicsContainer(object):
 
         return self._nextAnimationFrame()
 
+    def show(self):
+        """
+        show(self)
+        Draw the axis and show the underlying data
+        """
+
+        # Bring the correct figure into focus
+        pl.figure(self._figure.number)
+
+        # Set up labels
+        self._axes.set_xlabel(self._x_label)
+        self._axes.set_ylabel(self._y_label)
+        if (self._is_3d):
+            self._axes.set_zlabel(self._z_label)
+
+        # Set up the line widths and fonts for axes labels
+        for line in self._lines:
+            line.set_linewidth(self._line_width)
+
+        # Display the plot
+        pl.ion()
+        pl.show(self._axes)
+
+class LineContainer(GraphicsContainer):
+
+    """
+    Derived from GraphicsContainer for specifically animating Line or line-like
+    objects. At any point in the animation, the entire history of the line
+    object is visible and the line keeps growing
+
+    """
+
+    def __init__(self, axes_projection=None):
+        GraphicsContainer.__init__(self, axes_projection)
+
     def _nextAnimationFrame(self, step=0):
         """
         _nextAnimationFrame(self, step)
@@ -199,26 +234,25 @@ class GraphicsContainer(object):
         
         self._lines     += self._axes.plot(*plt_args)
 
-    def show(self):
+class PointContainer(GraphicsContainer):
+
+    """
+    Derived from GraphicsContainer. This object shows the movement of an object
+    in space. Only the current position (or a short, fixed trail is displayed)
+
+    """
+
+    def __init__(self, axes_projection=None):
+        GraphicsContainer.__init__(self, axes_projection)
+
+    def plot(self, *plt_args):
         """
-        show(self)
-        Draw the axis and show the underlying data
+        plot(self, *plt_args)
+        :*plt_args: Variable number of arguments to be plotted (Shouldn't be
+        more that 3)
+        :returns: Nothing is returned at the end of the function, however, the
+            _lines member of the class is updated with the line that was
+            plotted
         """
 
-        
-        # Bring the correct figure into focus
-        pl.figure(self._figure.number)
-
-        # Set up labels
-        self._axes.set_xlabel(self._x_label)
-        self._axes.set_ylabel(self._y_label)
-        if (self._is_3d):
-            self._axes.set_zlabel(self._z_label)
-        
-        # Set up the line widths and fonts for axes labels
-        for line in self._lines:
-            line.set_linewidth(self._line_width)
-
-        # Display the plot
-        pl.ion()
-        pl.show(self._axes)
+        self._axes.scatter(*plt_args)
