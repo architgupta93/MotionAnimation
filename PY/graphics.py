@@ -5,7 +5,6 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
 class GraphicsContainer(object):
-
     """
     Parent object for storing graphical structures.  The information stored in
     this object is used for rendering both static and dynamic plots
@@ -46,7 +45,7 @@ class GraphicsContainer(object):
         self._ANIMATION_INTERVAL = 25   # Frame rate for animation
 
         # Storage for all the line plots
-        self._lines     = []
+        self._track     = []
 
     def _initAnimationFrame(self):
         """
@@ -68,7 +67,7 @@ class GraphicsContainer(object):
         min_y = np.inf
         max_y = -np.inf
 
-        for idx, line in enumerate(self._lines):
+        for idx, line in enumerate(self._track):
             min_x = min(min_x, min(self._anim_data[idx][0]))
             max_x = max(max_x, max(self._anim_data[idx][0]))
 
@@ -83,69 +82,22 @@ class GraphicsContainer(object):
 
         return self._nextAnimationFrame()
 
-    def show(self):
+    def _setupTracks(self, n_trajectories):
+        """TODO: Docstring for _setupTracks.
+        :returns: TODO
+
         """
-        show(self)
-        Draw the axis and show the underlying data
+        for traj in range(n_trajectories):
+            self._track[traj] = None
+
+    def _nextAnimationFrame(self):
         """
+        Default implementation, not to be used.
+        Protected function for creating the next animation frame.
 
-        # Bring the correct figure into focus
-        pl.figure(self._figure.number)
-
-        # Set up labels
-        self._axes.set_xlabel(self._x_label)
-        self._axes.set_ylabel(self._y_label)
-        if (self._is_3d):
-            self._axes.set_zlabel(self._z_label)
-
-        # Set up the line widths and fonts for axes labels
-        for line in self._lines:
-            line.set_linewidth(self._line_width)
-
-        # Display the plot
-        pl.ion()
-        pl.show(self._axes)
-
-class LineContainer(GraphicsContainer):
-
-    """
-    Derived from GraphicsContainer for specifically animating Line or line-like
-    objects. At any point in the animation, the entire history of the line
-    object is visible and the line keeps growing
-
-    """
-
-    def __init__(self, axes_projection=None):
-        GraphicsContainer.__init__(self, axes_projection)
-
-    def _nextAnimationFrame(self, step=0):
-        """
-        _nextAnimationFrame(self, step)
-        Local function used for animations of trajectories. If no value for
-        'step' or the frame index is provided, this returns the first frame
-        (default). It can therefore be used for the initial frame too
-
-        :step: The index of the step or frame at which the system is
-        :returns: A Line object which should be plotted at the next animation
-            frame
         """
 
-        # print("Setting up next frame")
-        next_time_val_for_frame = self._tpts[0][step]
-        # print("Searching for time point:", next_time_val_for_frame)
-
-        for idx, anim_data in enumerate(self._anim_data):
-            # This loop enumerates each trajectory
-            # Now within each trajectory, we need to enumerate each dimension
-            idx_step = np.searchsorted(self._tpts[idx], next_time_val_for_frame)
-            # print("Time point: ", self._tpts[idx][idx_step], "found at index:", idx_step)
-            for dim, dim_data in enumerate(anim_data):
-                for frame_index in range(self._t_elapsed[idx], idx_step):
-                    self._past_data[idx][dim].append(dim_data[frame_index])
-            self._t_elapsed[idx] = idx_step
-
-        self._update()
-        return self._lines
+        return None
 
     def animate(self, tr_obj):
         """
@@ -191,9 +143,8 @@ class LineContainer(GraphicsContainer):
 
         # Set up the line plots for animation
         # print("Animating", n_trajectories, "trajectories, and", n_frames, "frames.")
-        self._lines     = [[] for traj in range(n_trajectories)]
-        for traj in range(n_trajectories):
-            self._lines[traj],    = pl.plot([], [], animated=True)
+        self._track = [[] for traj in range(n_trajectories)]
+        self._setupTracks(n_trajectories)
 
         # TODO: Setting blit to True causes the initialization function to be
         # called twice instead of just one time, strange. Setting it to false,
@@ -204,6 +155,76 @@ class LineContainer(GraphicsContainer):
 
         pl.show()
 
+    def show(self):
+        """
+        show(self)
+        Draw the axis and show the underlying data
+        """
+
+        # Bring the correct figure into focus
+        pl.figure(self._figure.number)
+
+        # Set up labels
+        self._axes.set_xlabel(self._x_label)
+        self._axes.set_ylabel(self._y_label)
+        if (self._is_3d):
+            self._axes.set_zlabel(self._z_label)
+
+        # Set up the line widths and fonts for axes labels
+        for line in self._track:
+            line.set_linewidth(self._line_width)
+
+        # Display the plot
+        pl.ion()
+        pl.show(self._axes)
+
+class LineContainer(GraphicsContainer):
+    """
+    Derived from GraphicsContainer for specifically animating Line or line-like
+    objects. At any point in the animation, the entire history of the line
+    object is visible and the line keeps growing
+
+    """
+
+    def __init__(self, axes_projection=None):
+        GraphicsContainer.__init__(self, axes_projection)
+
+    def _setupTracks(self, n_trajectories):
+        """TODO: Docstring for _setupTracks.
+        :returns: TODO
+
+        """
+        for traj in range(n_trajectories):
+            self._track[traj],    = pl.plot([], [], animated=True)
+
+    def _nextAnimationFrame(self, step=0):
+        """
+        _nextAnimationFrame(self, step)
+        Local function used for animations of trajectories. If no value for
+        'step' or the frame index is provided, this returns the first frame
+        (default). It can therefore be used for the initial frame too
+
+        :step: The index of the step or frame at which the system is
+        :returns: A Line object which should be plotted at the next animation
+            frame
+        """
+
+        # print("Setting up next frame")
+        next_time_val_for_frame = self._tpts[0][step]
+        # print("Searching for time point:", next_time_val_for_frame)
+
+        for idx, anim_data in enumerate(self._anim_data):
+            # This loop enumerates each trajectory
+            # Now within each trajectory, we need to enumerate each dimension
+            idx_step = np.searchsorted(self._tpts[idx], next_time_val_for_frame)
+            # print("Time point: ", self._tpts[idx][idx_step], "found at index:", idx_step)
+            for dim, dim_data in enumerate(anim_data):
+                for frame_index in range(self._t_elapsed[idx], idx_step):
+                    self._past_data[idx][dim].append(dim_data[frame_index])
+            self._t_elapsed[idx] = idx_step
+
+        self._update()
+        return self._track
 
     def _update(self):
         """
@@ -217,9 +238,9 @@ class LineContainer(GraphicsContainer):
 
         # Make sure that we have the correct number of line plots being fed in
         # as we already have in the current plot.
-        # assert(len(self._lines) == len(plt_args))
+        # assert(len(self._track) == len(plt_args))
 
-        for idx, line in enumerate(self._lines):
+        for idx, line in enumerate(self._track):
             line.set_data(*self._past_data[idx])
 
     def plot(self, *plt_args):
@@ -228,14 +249,13 @@ class LineContainer(GraphicsContainer):
         :*plt_args: Variable number of arguments to be plotted (Shouldn't be
         more that 3)
         :returns: Nothing is returned at the end of the function, however, the
-            _lines member of the class is updated with the line that was
+            _track member of the class is updated with the line that was
             plotted
         """
         
-        self._lines     += self._axes.plot(*plt_args)
+        self._track.append(self._axes.plot(*plt_args))
 
 class PointContainer(GraphicsContainer):
-
     """
     Derived from GraphicsContainer. This object shows the movement of an object
     in space. Only the current position (or a short, fixed trail is displayed)
@@ -245,14 +265,68 @@ class PointContainer(GraphicsContainer):
     def __init__(self, axes_projection=None):
         GraphicsContainer.__init__(self, axes_projection)
 
+    def _setupTracks(self, n_trajectories):
+        """TODO: Docstring for _setupTracks.
+        :returns: TODO
+
+        """
+        for traj in range(n_trajectories):
+            self._track[traj] = pl.scatter([], [], animated=True)
+
+    def _nextAnimationFrame(self, step=0):
+        """
+        _nextAnimationFrame(self, step)
+        Local function used for animations of trajectories. If no value for
+        'step' or the frame index is provided, this returns the first frame
+        (default). It can therefore be used for the initial frame too
+
+        :step: The index of the step or frame at which the system is
+        :returns: A Line object which should be plotted at the next animation
+            frame
+        """
+
+        # print("Setting up next frame")
+        next_time_val_for_frame = self._tpts[0][step]
+        # print("Searching for time point:", next_time_val_for_frame)
+
+        for idx, anim_data in enumerate(self._anim_data):
+            # This loop enumerates each trajectory
+            # Now within each trajectory, we need to enumerate each dimension
+            idx_step = np.searchsorted(self._tpts[idx], next_time_val_for_frame)
+            # print("Time point: ", self._tpts[idx][idx_step], "found at index:", idx_step)
+            for dim, dim_data in enumerate(anim_data):
+                for frame_index in range(self._t_elapsed[idx], idx_step):
+                    self._past_data[idx][dim] = dim_data[frame_index]
+            self._t_elapsed[idx] = idx_step
+
+        self._update()
+        return self._track
+
+    def _update(self):
+        """
+        _update(self)
+        Local function used to update an exisiting set of line plots. We can
+        append the data in self._past_data to the existing line plots
+
+        :returns: Line object which can be used by matplotlib's animation
+            module
+        """
+
+        # Make sure that we have the correct number of line plots being fed in
+        # as we already have in the current plot.
+        # assert(len(self._track) == len(plt_args))
+
+        for idx, line in enumerate(self._track):
+            line.set_offsets(self._past_data[idx])
+
     def plot(self, *plt_args):
         """
         plot(self, *plt_args)
         :*plt_args: Variable number of arguments to be plotted (Shouldn't be
         more that 3)
         :returns: Nothing is returned at the end of the function, however, the
-            _lines member of the class is updated with the line that was
+            _track member of the class is updated with the line that was
             plotted
         """
 
-        self._axes.scatter(*plt_args)
+        self._track.append(self._axes.scatter(*plt_args))
