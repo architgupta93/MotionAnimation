@@ -255,15 +255,15 @@ class LineContainer(GraphicsContainer):
         
         self._track.append(self._axes.plot(*plt_args))
 
-class PointContainer(GraphicsContainer):
+class PointContainer(LineContainer):
     """
-    Derived from GraphicsContainer. This object shows the movement of an object
+    Derived from LineContainer. This object shows the movement of an object
     in space. Only the current position (or a short, fixed trail is displayed)
 
     """
 
     def __init__(self, axes_projection=None):
-        GraphicsContainer.__init__(self, axes_projection)
+        LineContainer.__init__(self, axes_projection)
 
     def _setupTracks(self, n_trajectories):
         """TODO: Docstring for _setupTracks.
@@ -271,7 +271,7 @@ class PointContainer(GraphicsContainer):
 
         """
         for traj in range(n_trajectories):
-            self._track[traj] = pl.scatter([], [], animated=True)
+            self._track[traj],    = pl.plot([], [], animated=True, marker='o')
 
     def _nextAnimationFrame(self, step=0):
         """
@@ -302,31 +302,3 @@ class PointContainer(GraphicsContainer):
         self._update()
         return self._track
 
-    def _update(self):
-        """
-        _update(self)
-        Local function used to update an exisiting set of line plots. We can
-        append the data in self._past_data to the existing line plots
-
-        :returns: Line object which can be used by matplotlib's animation
-            module
-        """
-
-        # Make sure that we have the correct number of line plots being fed in
-        # as we already have in the current plot.
-        # assert(len(self._track) == len(plt_args))
-
-        for idx, line in enumerate(self._track):
-            line.set_offsets(self._past_data[idx])
-
-    def plot(self, *plt_args):
-        """
-        plot(self, *plt_args)
-        :*plt_args: Variable number of arguments to be plotted (Shouldn't be
-        more that 3)
-        :returns: Nothing is returned at the end of the function, however, the
-            _track member of the class is updated with the line that was
-            plotted
-        """
-
-        self._track.append(self._axes.scatter(*plt_args))
