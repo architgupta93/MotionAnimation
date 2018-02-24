@@ -8,7 +8,6 @@ import matplotlib.animation as animation
 from MotionAnimation.PY import graphics as grpx
 
 class Trajectory(object):
-
     """
     class Trajectory
     Base class implementing the interface for a trajectory
@@ -23,8 +22,11 @@ class Trajectory(object):
     OBJ_TYPE_DOT  = 'point'
 
     def __init__(self, t_vals=np.array(()), x_vals=None):
-
+        # Data labels and auxiliary information
         self._AXES_IDENTIFIER = None
+        self._data_label      = ['x']
+
+        # Data values
         self._time = t_vals
         self._X    = self._checkDataSize(x_vals)
 
@@ -42,6 +44,17 @@ class Trajectory(object):
         set
         """
         return self._time
+
+    def getAxisLabel(self, ax_idx):
+        """
+        Get a label string corresponding to the index of data.
+
+        :ax_idx: Index of the data entry. For a 3D trajectory, by default,
+            ax_idx 0 would mean 'x', ax_idx 1 would mean 'y', etc.
+        :returns: String associated with the data
+        """
+
+        return self._data_label[ax_idx]
 
     def getAxisIdentifier(self):
         return(self._AXES_IDENTIFIER)
@@ -113,6 +126,34 @@ class Trajectory(object):
 
         return(True)
 
+    def plot(self):
+        """
+        Show a vanilla plot with Time on the X-axis and one variable of the
+        trajectory along the Y-axis. In case of multi-dimensional trajectories,
+        different subplots are done for different trajectory variables (x,y,
+        and z).
+
+        :object_type: TODO
+        :returns: TODO
+
+        """
+        timestamps            = self.getTPts()
+        list_of_sample_values = self.getSampleValues()
+        n_vars_to_plot        = len(list_of_sample_values)
+
+        # Start a new figure window
+        figure                = pl.figure()
+
+        # Instead of getting a figure handle which does a state space plot, we
+        # just plot the timed trajectory
+        for tr_idx, tr_var in enumerate(list_of_sample_values):
+            ax = figure.add_subplot(n_vars_to_plot, 1, 1+tr_idx)
+            ax.plot(timestamps, list_of_sample_values[tr_idx])
+            ax.xaxis.set_label_text('Time')
+            ax.yaxis.set_label_text(self.getAxisLabel(tr_idx))
+
+        pl.show(figure)
+
     def getSampleValues(self, *opts):
         """
         getSampleValues(self, *opts)
@@ -129,7 +170,6 @@ class Trajectory(object):
         return [self._X]
 
 class Trajectory__2D(Trajectory):
-
     """
     class Trajectory__2D 
 
@@ -137,6 +177,7 @@ class Trajectory__2D(Trajectory):
 
     def __init__(self, t_vals, x_vals, y_vals):
         super(Trajectory__2D, self).__init__(t_vals, x_vals)
+        self._data_label.append('y')
         self._Y    = self._checkDataSize(y_vals)
     
     def getSampleValues(self, *opts):
@@ -150,7 +191,6 @@ class Trajectory__2D(Trajectory):
         return [self._X, self._Y]
 
 class Trajectory__3D(Trajectory__2D):
-
     """
     class Trajectory__3D
 
@@ -158,6 +198,7 @@ class Trajectory__3D(Trajectory__2D):
 
     def __init__(self, t_vals, x_vals, y_vals, z_vals):
         super(Trajectory__3D, self).__init__(t_vals, x_vals, y_vals)
+        self._data_label.append('z')
         self._AXES_IDENTIFIER = '3d'
         self._Z    = self._checkDataSize(z_vals)
     
