@@ -126,33 +126,51 @@ class Trajectory(object):
 
         return(True)
 
-    def plot(self):
+    def plot(self, figure_handle=None, axes_handles=None, show=True):
         """
         Show a vanilla plot with Time on the X-axis and one variable of the
         trajectory along the Y-axis. In case of multi-dimensional trajectories,
         different subplots are done for different trajectory variables (x,y,
         and z).
 
-        :object_type: TODO
-        :returns: TODO
+        :figure_handle: Unlike the other functions, here, figure_handle is the
+            figure window in which the data must be plotted.
+        :axes_handles: In case a figure window is supplied, the axes handles
+            can also be supplied in which the individual coordinates have to be
+            plotted.
+        :returns: the figure_handle and the axes_handles used for plotting.
 
         """
         timestamps            = self.getTPts()
         list_of_sample_values = self.getSampleValues()
         n_vars_to_plot        = len(list_of_sample_values)
 
-        # Start a new figure window
-        figure                = pl.figure()
+        if figure_handle is None:
+            # Start a new figure window
+            figure_handle = pl.figure()
+
+        if axes_handles is not None:
+            # Make sure that the correct number of axes handles have been
+            # supplied - one for each variable to be plotted.
+            assert(len(axes_handles) == n_vars_to_plot)
+        else:
+            # Creating new axes handles
+            axes_handles = []
+            for tr_idx in range(n_vars_to_plot):
+                ax = figure_handle.add_subplot(n_vars_to_plot, 1, 1+tr_idx)
+                ax.xaxis.set_label_text('Time')
+                ax.yaxis.set_label_text(self.getAxisLabel(tr_idx))
+                axes_handles.append(ax)
 
         # Instead of getting a figure handle which does a state space plot, we
         # just plot the timed trajectory
         for tr_idx, tr_var in enumerate(list_of_sample_values):
-            ax = figure.add_subplot(n_vars_to_plot, 1, 1+tr_idx)
-            ax.plot(timestamps, list_of_sample_values[tr_idx])
-            ax.xaxis.set_label_text('Time')
-            ax.yaxis.set_label_text(self.getAxisLabel(tr_idx))
+            axes_handles[tr_idx].plot(timestamps, list_of_sample_values[tr_idx])
 
-        pl.show(figure)
+        if show:
+            pl.show(figure_handle)
+
+        return figure_handle, axes_handles
 
     def getSampleValues(self, *opts):
         """
@@ -268,6 +286,26 @@ class TrajectorySet(object):
         if trajectory_axis_identifier is not None:
             self._axis_identifier = trajectory_axis_identifier
         self._tr_set    += [tr]
+
+    def plot(self, figure_handle=None):
+        """
+        Vanilla plotting of variour coordinates for a set of trajectories
+
+        :figure_handle: Figure window in which the trajectories should be drawn
+
+        """
+        n_trajectories = self.getNTrajectories()
+        if n_trajectories == 0:
+            return
+
+        if figure_handle is None:
+            figure_handle = pl.figure()
+
+        figure_handle, axes_handles = self._tr_set[0].plot(figure_handle,show=False)
+        for tr_idx in range(1,n_trajectories):
+            self._tr_set[tr_idx].plot(figure_handle, show=False)
+
+        pl.show(figure_handle)
 
     def plotStaticTR(self, figure_handle=None):
         """
