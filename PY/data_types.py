@@ -119,12 +119,7 @@ class Trajectory(object):
         if (show):
             figure_handle.show()
 
-        return(True)
-        
-        if (show):
-            figure_handle.show()
-
-        return(True)
+        return(figure_handle.getFigureWindow())
 
     def plot(self, figure_handle=None, axes_handles=None, show=True):
         """

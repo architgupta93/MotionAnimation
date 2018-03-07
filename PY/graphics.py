@@ -1,4 +1,5 @@
 import matplotlib.pyplot as pl
+import matplotlib.cm as colormap
 import matplotlib.animation as animation
 import numpy as np
 
@@ -178,6 +179,9 @@ class GraphicsContainer(object):
         pl.ion()
         pl.show(self._axes)
 
+    def getFigureWindow(self):
+        return self._figure
+
 class LineContainer(GraphicsContainer):
     """
     Derived from GraphicsContainer for specifically animating Line or line-like
@@ -194,8 +198,11 @@ class LineContainer(GraphicsContainer):
         :returns: TODO
 
         """
+
+        # Choosing colors for different trajectories
+        colors = colormap.magma(np.linspace(0, 1, n_trajectories))
         for traj in range(n_trajectories):
-            self._track[traj],    = pl.plot([], [], animated=True)
+            self._track[traj],    = pl.plot([], [], animated=True, c=colors[traj])
 
     def _nextAnimationFrame(self, step=0):
         """
@@ -253,7 +260,7 @@ class LineContainer(GraphicsContainer):
             plotted
         """
         
-        self._track.append(self._axes.plot(*plt_args))
+        self._track.append(self._axes.plot(*plt_args, alpha=0.5))
 
 class PointContainer(LineContainer):
     """
