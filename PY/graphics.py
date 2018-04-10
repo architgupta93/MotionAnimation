@@ -308,4 +308,3 @@ class PointContainer(LineContainer):
 
         self._update()
         return self._track
-

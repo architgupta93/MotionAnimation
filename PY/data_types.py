@@ -176,11 +176,21 @@ class Trajectory(object):
         :*opts: Variable input argument list not used by the function. It is
             here to maintain consistency with the calling syntax for trajectory
             set class
-        :returns: The sample values of the trajector as a list of numpy arrays.
+        :returns: The sample values of the trajectory as a list of numpy arrays.
 
         """
 
         return [self._X]
+
+    def update(self, *values):
+        """
+        Updated the values already available in the trajectory.
+        Takes in a list of lists (The number of lists put in should match the
+        class's expectations), for example, 2 for 1D trajectory (time, X).
+        """
+        self._time = np.append(self._time, values[0])
+        self._X = np.append(self._X, values[1])
+        return
 
 class Trajectory__2D(Trajectory):
     """
@@ -188,7 +198,7 @@ class Trajectory__2D(Trajectory):
 
     """
 
-    def __init__(self, t_vals, x_vals, y_vals):
+    def __init__(self, t_vals=np.array(()), x_vals=None, y_vals=None):
         super(Trajectory__2D, self).__init__(t_vals, x_vals)
         self._data_label.append('y')
         self._Y    = self._checkDataSize(y_vals)
@@ -202,6 +212,16 @@ class Trajectory__2D(Trajectory):
         """
        
         return [self._X, self._Y]
+
+    def update(self, *values):
+        """
+        Updated the values already available in the trajectory.
+        Takes in a list of lists (The number of lists put in should match the
+        class's expectations), for example, 2 for 1D trajectory (time, X).
+        """
+        super(Trajectory__2D, self).update(values[0], values[1])
+        self._Y = np.append(self._Y, values[2])
+        return
 
 class Trajectory__3D(Trajectory__2D):
     """
@@ -224,6 +244,16 @@ class Trajectory__3D(Trajectory__2D):
         """
        
         return [self._X, self._Y, self._Z]
+
+    def update(self, *values):
+        """
+        Updated the values already available in the trajectory.
+        Takes in a list of lists (The number of lists put in should match the
+        class's expectations), for example, 2 for 1D trajectory (time, X).
+        """
+        super(Trajectory__3D, self).update(values[0], values[1], values[2])
+        self._Z = np.append(self._Z, values[3])
+        return
 
 class TrajectorySet(object):
     """
