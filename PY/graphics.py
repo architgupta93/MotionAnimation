@@ -1,4 +1,4 @@
-import matplotlib.pyplot as pl
+import matplotlib.pylab as pl
 import matplotlib.cm as colormap
 import matplotlib.animation as animation
 import numpy as np

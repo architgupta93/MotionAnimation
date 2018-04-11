@@ -3,7 +3,7 @@ This file implements data types for describing trajectories that we will be plot
 """
 
 import numpy as np
-import matplotlib.pyplot as pl
+import matplotlib.pylab as pl
 import matplotlib.animation as animation
 from MotionAnimation.PY import graphics as grpx
 
