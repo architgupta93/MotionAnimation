@@ -68,7 +68,7 @@ class GraphicsContainer(object):
         min_y = np.inf
         max_y = -np.inf
 
-        for idx, line in enumerate(self._track):
+        for idx, _ in enumerate(self._track):
             min_x = min(min_x, min(self._anim_data[idx][0]))
             max_x = max(max_x, max(self._anim_data[idx][0]))
 
@@ -260,7 +260,10 @@ class LineContainer(GraphicsContainer):
             plotted
         """
         
-        self._track.append(self._axes.plot(*plt_args, alpha=0.5))
+        new_trajectories = self._axes.plot(*plt_args, alpha=0.5)
+        for tr in new_trajectories:
+            self._track.append(tr)
+        return
 
 class PointContainer(LineContainer):
     """
