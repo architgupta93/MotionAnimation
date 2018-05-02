@@ -1,0 +1,2 @@
+1.  Setup the test scripts so that they can be run directly from commandline.
+    Currently, running the test scripts requires setting up PYTHONPATH first.
