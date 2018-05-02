@@ -176,7 +176,7 @@ class GraphicsContainer(object):
             line.set_linewidth(self._line_width)
 
         # Display the plot
-        pl.ion()
+        # pl.ion()
         pl.show(self._axes)
 
     def getFigureWindow(self):
