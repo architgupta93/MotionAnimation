@@ -260,7 +260,7 @@ class LineContainer(GraphicsContainer):
             plotted
         """
         
-        new_trajectories = self._axes.plot(*plt_args, alpha=0.5)
+        new_trajectories = self._axes.plot(*plt_args)
         for tr in new_trajectories:
             self._track.append(tr)
         return

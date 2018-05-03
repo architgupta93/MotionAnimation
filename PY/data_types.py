@@ -103,7 +103,7 @@ class Trajectory(object):
         figure_handle.animate(self)
         return(True)
 
-    def plotStaticTR(self, object_type=None, figure_handle=None, show=True):
+    def plotStaticTR(self, object_type=None, figure_handle=None, show=True, show_start_stop=True):
         """
         plotStaticTR(self, object_type, figure_handle)
         Function is used to plot the trajectory data as a static plot in the
@@ -123,6 +123,20 @@ class Trajectory(object):
         list_of_sample_values   = self.getSampleValues()
         figure_handle = getFigureHandle(self._AXES_IDENTIFIER, object_type, in_fhandle=figure_handle)
         figure_handle.plot(*list_of_sample_values)
+
+        if show_start_stop:
+        # Optional: Can be disabled by passing in appropriate argument
+        # Show the first and the last points in the trajectory separately
+            start_point = []
+            end_point   = []
+            for data in list_of_sample_values:
+                start_point.append(data[0])
+                end_point.append(data[-1])
+
+            # Show the start and end points
+            figure_handle.plot(*start_point, 'go')
+            figure_handle.plot(*end_point, 'rs')
+
         self.enforceLimits()
 
         if (show):
