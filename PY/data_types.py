@@ -25,10 +25,20 @@ class Trajectory(object):
         # Data labels and auxiliary information
         self._AXES_IDENTIFIER = None
         self._data_label      = ['x']
+        self._X_lims          = None
 
         # Data values
         self._time = t_vals
         self._X    = self._checkDataSize(x_vals)
+
+    def enforceLimits(self):
+        if self._X_lims is None:
+            return
+
+        pl.xlim(self._X_lims)
+
+    def setLims(self, x_lims):
+        self._X_lims = x_lims
 
     def getNTrajectories(self):
         """
@@ -89,7 +99,6 @@ class Trajectory(object):
 
         """
 
-        list_of_sample_values   = self.getSampleValues()
         figure_handle = getFigureHandle(self._AXES_IDENTIFIER, object_type, in_fhandle=figure_handle)
         figure_handle.animate(self)
         return(True)
@@ -112,9 +121,9 @@ class Trajectory(object):
         """
 
         list_of_sample_values   = self.getSampleValues()
-
         figure_handle = getFigureHandle(self._AXES_IDENTIFIER, object_type, in_fhandle=figure_handle)
         figure_handle.plot(*list_of_sample_values)
+        self.enforceLimits()
 
         if (show):
             figure_handle.show()
@@ -201,8 +210,20 @@ class Trajectory__2D(Trajectory):
     def __init__(self, t_vals=np.array(()), x_vals=None, y_vals=None):
         super(Trajectory__2D, self).__init__(t_vals, x_vals)
         self._data_label.append('y')
-        self._Y    = self._checkDataSize(y_vals)
-    
+        self._Y      = self._checkDataSize(y_vals)
+        self._Y_lims = [0, 0]
+
+    def setLims(self, x_lims, y_lims):
+        self._X_lims = x_lims
+        self._Y_lims = y_lims
+
+    def enforceLimits(self):
+        super(Trajectory__2D, self).enforceLimits()
+        if self._Y_lims is None:
+            return
+
+        pl.ylim(self._Y_lims)
+
     def getSampleValues(self, *opts):
         """
         getSampleValues(self) [PROTECTED FUNCTION]
@@ -233,7 +254,20 @@ class Trajectory__3D(Trajectory__2D):
         super(Trajectory__3D, self).__init__(t_vals, x_vals, y_vals)
         self._data_label.append('z')
         self._AXES_IDENTIFIER = '3d'
-        self._Z    = self._checkDataSize(z_vals)
+        self._Z      = self._checkDataSize(z_vals)
+        self._Z_lims = [0, 0]
+
+    def setLims(self, x_lims, y_lims, z_lims):
+        self._X_lims = x_lims
+        self._Y_lims = y_lims
+        self._Z_lims = z_lims
+
+    def enforceLimits(self):
+        super(Trajectory__3D, self).enforceLimits()
+        if self._Z_lims is None:
+            return
+
+        pl.zlim(self._Z_lims)
     
     def getSampleValues(self, *opts):
         """
