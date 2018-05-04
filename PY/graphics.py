@@ -263,6 +263,8 @@ class LineContainer(GraphicsContainer):
         new_trajectories = self._axes.plot(*plt_args)
         for tr in new_trajectories:
             self._track.append(tr)
+
+        pl.grid(True)
         return
 
 class PointContainer(LineContainer):
