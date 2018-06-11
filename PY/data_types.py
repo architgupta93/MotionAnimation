@@ -69,6 +69,11 @@ class Trajectory(object):
     def getAxisIdentifier(self):
         return(self._AXES_IDENTIFIER)
 
+    def getContainer(self, object_type=None, figure_handle=None):
+        # Get a graphics container that can be used to overlay trajectory with
+        # other data (Example: Objects in the environment)
+        return getFigureHandle(self._AXES_IDENTIFIER, object_type, in_fhandle=figure_handle)
+
     def _checkDataSize(self, data):
         """
         _checkDataSize(self, data)
