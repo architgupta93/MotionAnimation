@@ -139,7 +139,7 @@ class Trajectory(object):
                 end_point.append(data[-1])
 
             # Show the start and end points
-            figure_handle.plot(*start_point, 'go')
+            figure_handle.plot(*start_point, 'bo')
             figure_handle.plot(*end_point, 'rs')
 
         self.enforceLimits()
