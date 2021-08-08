@@ -5,6 +5,30 @@ import numpy as np
 
 from mpl_toolkits.mplot3d import Axes3D
 
+SMALL_SIZE = 12
+MEDIUM_SIZE = 16
+BIGGER_SIZE = 18
+AXES_LINE_THICCCK = 2.0
+
+pl.rc('font', size=SMALL_SIZE)          # controls default text sizes
+pl.rc('axes', titlesize=BIGGER_SIZE)     # fontsize of the axes title
+pl.rc('axes', labelsize=MEDIUM_SIZE)    # fontsize of the x and y labels
+pl.rc('xtick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+pl.rc('ytick', labelsize=MEDIUM_SIZE)    # fontsize of the tick labels
+pl.rc('legend', fontsize=SMALL_SIZE)    # legend fontsize
+
+def cleanAxes(ax_obj):
+    ax_obj.spines['top'].set_visible(False)
+    ax_obj.spines['right'].set_visible(False)
+    ax_obj.spines['bottom'].set_linewidth(AXES_LINE_THICCCK)
+    ax_obj.spines['left'].set_linewidth(AXES_LINE_THICCCK)
+    ax_obj.tick_params(axis="y",direction="in", left="off",labelleft="on") 
+    ax_obj.tick_params(axis="x",direction="in", bottom="off",labelbottom="on") 
+    ax_obj.xaxis.set_tick_params(width=AXES_LINE_THICCCK)
+    ax_obj.yaxis.set_tick_params(width=AXES_LINE_THICCCK)
+    ax_obj.grid(False)
+    pl.tight_layout()
+
 class GraphicsContainer(object):
     """
     Parent object for storing graphical structures.  The information stored in
@@ -25,15 +49,15 @@ class GraphicsContainer(object):
         pl.rcParams.update({'font.size':GraphicsContainer.TEXT_FONT_SIZE})
 
         # By default, we have 2D axes.
-        self._figure    = pl.figure()     
+        self._figure    = pl.figure(figsize=(4,4))
         self._axes      = pl.axes(projection=axes_projection)
         self._is_3d     = (axes_projection == '3d')
-        self._x_label   = 'x'
-        self._y_label   = 'y'
+        self._x_label   = 'X Position (m)'
+        self._y_label   = 'Y Position (m)'
         self._z_label   = 'z'
 
         # Some paratmeters for plotting
-        self._line_width    = 3.0
+        self._line_width    = 2.0
 
         # Include a pointer to the trajectory object
         self._tr_obj    = []
@@ -177,7 +201,11 @@ class GraphicsContainer(object):
 
         # Display the plot
         # pl.ion()
-        pl.show(self._axes)
+        # pl.show(self._axes)
+        self._axes.set_xticks((0, 2, 4, 6))
+        self._axes.set_yticks((0, 2, 4, 6))
+        pl.tight_layout()
+        pl.show()
 
     def getFigureWindow(self):
         return self._figure
@@ -264,7 +292,7 @@ class LineContainer(GraphicsContainer):
         for tr in new_trajectories:
             self._track.append(tr)
 
-        pl.grid(True)
+        cleanAxes(self._axes)
         return
 
 class PointContainer(LineContainer):
